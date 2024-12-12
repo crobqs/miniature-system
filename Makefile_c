@@ -1,0 +1,36 @@
+# Compiler and Flags
+CC       := gcc
+VERSION  := -std=c23
+FLAGS    := -Wall -pedantic -fsanitize=address
+INCPATH  := -I.
+LIBPATH  := -L.
+LIBS     := -lm -lpthread -ldl
+
+# Files and Targets
+SRC      := $(wildcard *.c)
+TARGET   := ./main
+
+.SILENT:
+# .PHONY ensures these targets are not confused with files
+.PHONY: all run just clean
+
+# Default Target: Compile and Run
+all: $(TARGET) run
+
+# Compile Only
+just: $(TARGET)
+
+# Link the Executable
+$(TARGET): $(SRC)
+	@echo "Building $(TARGET)..."
+	$(CC) $(VERSION) $(FLAGS) $(INCPATH) $(LIBPATH) $(SRC) $(LIBS) -o $(TARGET)
+
+# Run the Executable
+run: $(TARGET)
+	@echo "Running $(TARGET)..."
+	@$(TARGET)
+
+# Clean Target
+clean:
+	@echo "Cleaning up..."
+	$(RM) $(TARGET)
