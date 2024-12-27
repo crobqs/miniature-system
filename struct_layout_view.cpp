@@ -36,25 +36,25 @@
     } \
     std::cout << std::endl;}
 
-struct X {
+typedef struct {
     char a;
     int b;
     char c;
-};
+} Padded;
 
 #pragma pack(push, 1)
-struct XX {
+typedef struct {
     char a;
     int b;
     char c;
-};
+} Packed;
 #pragma pack(pop)
 
-static void view_X(void) {
+static void view(void) {
     REPEAT;
 
     #undef FIELD_STRUCT
-    #define FIELD_STRUCT struct X
+    #define FIELD_STRUCT Padded
     FIELD_VEC = {
         FIELD(a, char),
         FIELD(b, int),
@@ -64,7 +64,7 @@ static void view_X(void) {
     FIELD_PRINT;
 
     #undef FIELD_STRUCT
-    #define FIELD_STRUCT struct XX
+    #define FIELD_STRUCT Packed
     FIELD_VEC = {
         FIELD(a, char),
         FIELD(b, int),
@@ -75,7 +75,7 @@ static void view_X(void) {
 }
 
 static void foo(void) {
-    view_X();
+    view();
 }
 
 int main(void) {
