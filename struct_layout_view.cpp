@@ -17,36 +17,61 @@
         ); \
         return oss.str(); \
     }
-#define FIELD_DUMMY(structure__) {"", sizeof(structure__), 0}
-#define FIELD(structure__, name__, type__) {#name__, offsetof(structure__, name__), sizeof(type__)}
-#define FIELD_VEC(vecname__) const std::vector<std::tuple<std::string, size_t, size_t>> vecname__
-#define FIELD_PRINT(vec__) \
+#define STRINGIZE_(x__) #x__
+#define STRINGIZE(x__) STRINGIZE_(x__)
+#define FIELD_DUMMY {"", sizeof(FIELD_STRUCT), 0}
+#define FIELD(name__, type__) {#name__, offsetof(FIELD_STRUCT, name__), sizeof(type__)}
+#define FIELD_STRUCT
+#define FIELD_VEC \
+    {std::cout << STRINGIZE(FIELD_STRUCT) << std::endl; \
+    const std::vector<std::tuple<std::string, size_t, size_t>> o
+#define FIELD_PRINT \
     for (int i = 0; i < o.size() - 1; ++i) { \
-        auto [name, offset, size] = vec__[i]; \
-        auto [_, next_offset, __] = vec__[i + 1]; \
+        auto [name, offset, size] = o[i]; \
+        auto [_, next_offset, __] = o[i + 1]; \
         std::cout << name << " | " \
         << repeat("* ", size) \
         << repeat("- ", next_offset - (offset + size)) \
         << std::endl; \
-    }
+    } \
+    std::cout << std::endl;}
 
-//#pragma pack(push, 1)
 struct X {
     char a;
     int b;
     char c;
 };
-//#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct XX {
+    char a;
+    int b;
+    char c;
+};
+#pragma pack(pop)
 
 static void view_X(void) {
     REPEAT;
-    FIELD_VEC(o) = {
-        FIELD(struct X, a, char),
-        FIELD(struct X, b, int),
-        FIELD(struct X, c, char),
-        FIELD_DUMMY(struct X)
+
+    #undef FIELD_STRUCT
+    #define FIELD_STRUCT struct X
+    FIELD_VEC = {
+        FIELD(a, char),
+        FIELD(b, int),
+        FIELD(c, char),
+        FIELD_DUMMY
     };
-    FIELD_PRINT(o);
+    FIELD_PRINT;
+
+    #undef FIELD_STRUCT
+    #define FIELD_STRUCT struct XX
+    FIELD_VEC = {
+        FIELD(a, char),
+        FIELD(b, int),
+        FIELD(c, char),
+        FIELD_DUMMY
+    };
+    FIELD_PRINT;
 }
 
 static void foo(void) {
